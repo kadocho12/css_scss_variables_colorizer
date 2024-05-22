@@ -1,17 +1,16 @@
-<h2>Shape Creator</h2>
-<p>Count: <input id="count" type="number" value="5"></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
+<textarea value="" type="text" id="variables-template"></textarea>
+<button id="getColorButton">Generate code</button>
+<p id="message"></p>
+
 <script>
-
-document.getElementById('create').onclick = () => {
-  const textbox = document.getElementById('count');
-  const count = parseInt(textbox.value, 10);
-  parent.postMessage({ pluginMessage: { type: 'create-shapes', count } }, '*')
-}
-
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-}
-
+document.getElementById('getColorButton').onclick = () => {
+  const inputValue = document.getElementById('variables-template').value;
+  parent.postMessage({ pluginMessage: { type: 'get-colors', value: inputValue } }, '*');
+};
+window.onmessage = (event) => {
+  const { type, message } = event.data.pluginMessage;
+  if (type === 'display-message') {
+    document.getElementById('message').innerText = message;
+  }
+};
 </script>

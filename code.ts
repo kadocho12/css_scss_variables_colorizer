@@ -1,89 +1,57 @@
-// This file holds the main code for plugins. Code in this file has access to
-// the *figma document* via the figma global object.
-// You can access browser APIs in the <script> tag inside "ui.html" which has a
-// full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
-
-// Runs this code if the plugin is run in Figma
-if (figma.editorType === 'figma') {
-  // This plugin will open a window to prompt the user to enter a number, and
-  // it will then create that many rectangles on the screen.
-
-  // This shows the HTML page in "ui.html".
-  figma.showUI(__html__);
-
-  // Calls to "parent.postMessage" from within the HTML page will trigger this
-  // callback. The callback will be passed the "pluginMessage" property of the
-  // posted message.
-  figma.ui.onmessage =  (msg: {type: string, count: number}) => {
-    // One way of distinguishing between different types of messages sent from
-    // your HTML page is to use an object with a "type" property like this.
-    if (msg.type === 'create-shapes') {
-      const nodes: SceneNode[] = [];
-      for (let i = 0; i < msg.count; i++) {
-        const rect = figma.createRectangle();
-        rect.x = i * 150;
-        rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-        figma.currentPage.appendChild(rect);
-        nodes.push(rect);
-      }
-      figma.currentPage.selection = nodes;
-      figma.viewport.scrollAndZoomIntoView(nodes);
-    }
-
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
-    figma.closePlugin();
-  };
+interface colorVariableHex {
+  name: string,
+  color: string,
 }
 
-// Runs this code if the plugin is run in FigJam
-if (figma.editorType === 'figjam') {
-  // This plugin will open a window to prompt the user to enter a number, and
-  // it will then create that many shapes and connectors on the screen.
+function rgbToHex(rgba: VariableValue) :string {
+  const {r, g, b} = rgba as any;
+  const r255 = Math.round(r * 255).toString(16).padStart(2, '0');
+  const g255 = Math.round(g * 255).toString(16).padStart(2, '0');
+  const b255 = Math.round(b * 255).toString(16).padStart(2, '0');
+  return `#${r255}${g255}${b255}`;
+}
 
-  // This shows the HTML page in "ui.html".
-  figma.showUI(__html__);
+figma.showUI(__html__);
+figma.ui.onmessage = async (msg: { type: string, count: number, value: string }) => {
+  if (msg.type === 'get-colors') {
+    try {
+      const variables = await figma.variables.getLocalVariablesAsync();
+      const colorVariables = variables.filter(variable => variable.resolvedType === 'COLOR');
+      const colorVariableHex: colorVariableHex[] = colorVariables.map(colorVariable => {
+        return {name: colorVariable.name, color: rgbToHex(colorVariable.valuesByMode['14:0'])}
+      });
 
-  // Calls to "parent.postMessage" from within the HTML page will trigger this
-  // callback. The callback will be passed the "pluginMessage" property of the
-  // posted message.
-  figma.ui.onmessage =  (msg: {type: string, count: number}) => {
-    // One way of distinguishing between different types of messages sent from
-    // your HTML page is to use an object with a "type" property like this.
-    if (msg.type === 'create-shapes') {
-      const numberOfShapes = msg.count;
-      const nodes: SceneNode[] = [];
-      for (let i = 0; i < numberOfShapes; i++) {
-        const shape = figma.createShapeWithText();
-        // You can set shapeType to one of: 'SQUARE' | 'ELLIPSE' | 'ROUNDED_RECTANGLE' | 'DIAMOND' | 'TRIANGLE_UP' | 'TRIANGLE_DOWN' | 'PARALLELOGRAM_RIGHT' | 'PARALLELOGRAM_LEFT'
-        shape.shapeType = 'ROUNDED_RECTANGLE'
-        shape.x = i * (shape.width + 200);
-        shape.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-        figma.currentPage.appendChild(shape);
-        nodes.push(shape);
-      }
+      const lines = msg.value.split('\n');
+      const updatedLines = lines.map(line => {
+        const scssVariablesRegex = /^\$/;
+        const cssVariableRegex = /^--/;
+        let regex;
+        if (line.match(scssVariablesRegex)) {
+          regex = /^\$(.*?):/;
+        } else if (line.match(cssVariableRegex)) {
+          regex = /^--(.*?):/;
+        } else {
+          regex = /^(?![/\d])(.*?):/;
+        }
 
-      for (let i = 0; i < (numberOfShapes - 1); i++) {
-        const connector = figma.createConnector();
-        connector.strokeWeight = 8
+        const match = line.match(regex);
+        if (match) {
+          const variableName = match[1];
+          const targetObject = colorVariableHex.find(item => item.name === variableName);
+          if (targetObject) {
+            const colorCodeRegex = /#.*?(?=\s|;|$)/;
+            const match2 = line.match(colorCodeRegex);
+            if (match2) {
+              line = line.replace(match2[0], targetObject.color);
+            }
+          }
+        }
+        return line;
+      });
 
-        connector.connectorStart = {
-          endpointNodeId: nodes[i].id,
-          magnet: 'AUTO',
-        };
-
-        connector.connectorEnd = {
-          endpointNodeId: nodes[i+1].id,
-          magnet: 'AUTO',
-        };
-      }
-
-      figma.currentPage.selection = nodes;
-      figma.viewport.scrollAndZoomIntoView(nodes);
+      figma.ui.postMessage({ type: 'display-message', message: updatedLines.join('\n')});
+    } catch (error) {
+      console.error('Error', error);
     }
-
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
-    figma.closePlugin();
-  };
+  }
 };
