@@ -17,8 +17,10 @@ figma.ui.onmessage = async (msg: { type: string, count: number, value: string })
     try {
       const variables = await figma.variables.getLocalVariablesAsync();
       const colorVariables = variables.filter(variable => variable.resolvedType === 'COLOR');
+      
       const colorVariableHex: colorVariableHex[] = colorVariables.map(colorVariable => {
-        return {name: colorVariable.name, color: rgbToHex(colorVariable.valuesByMode['14:0'])}
+        const rgba = Object.values(colorVariable.valuesByMode)[0]
+        return {name: colorVariable.name, color: rgbToHex(rgba)}
       });
 
       const lines = msg.value.split('\n');
