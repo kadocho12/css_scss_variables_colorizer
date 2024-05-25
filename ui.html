@@ -1,6 +1,12 @@
 <textarea value="" type="text" id="variables-template"></textarea>
 <button id="getColorButton">Generate code</button>
-<p id="message"></p>
+<pre id="message"></pre>
+
+<style>
+  pre {
+    white-space: pre-wrap;
+  }
+</style>
 
 <script>
 document.getElementById('getColorButton').onclick = () => {

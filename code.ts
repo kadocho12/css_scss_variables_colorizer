@@ -25,15 +25,15 @@ figma.ui.onmessage = async (msg: { type: string, count: number, value: string })
 
       const lines = msg.value.split('\n');
       const updatedLines = lines.map(line => {
-        const scssVariablesRegex = /^\$/;
-        const cssVariableRegex = /^--/;
+        const scssVariablesRegex = /^\s*\$/;
+        const cssVariableRegex = /^\s*--/;
         let regex;
         if (line.match(scssVariablesRegex)) {
-          regex = /^\$(.*?):/;
+          regex = /^\s*\$(.*?):/;
         } else if (line.match(cssVariableRegex)) {
-          regex = /^--(.*?):/;
+          regex = /^\s*--(.*?):/;
         } else {
-          regex = /^(?![/\d])(.*?):/;
+          regex = /^\s*(?![/\d])(.*?):/;
         }
 
         const match = line.match(regex);
