@@ -1,10 +1,87 @@
-<textarea value="" type="text" id="variables-template"></textarea>
-<button id="getColorButton">Generate code</button>
-<pre id="message"></pre>
+<h1>CSS/SCSS Variables Colorizer</h1>
+<div class="container">
+  <section>
+    <h2>Base code</h2>
+    <label for="input-field">Input field</label>
+    <textarea value="" type="text" id="variables-template" name="input-field"></textarea>
+    <button id="getColorButton">Colorize</button>
+  </section>
+  <div class="arrow">→</div>
+  <section>
+    <h2>Colorized code</h2>
+    <div class="message-wrapper">
+      <pre id="message"></pre>
+    </div>
+  </section>
+</div>
 
 <style>
+  .arrow {
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .message-wrapper {
+    padding: 8px;
+    margin-top: 24px;
+    border: 1px solid #eee;
+    height: 144px;
+    overflow: auto;
+  }
   pre {
+    padding: 0;
+    margin: 0;
     white-space: pre-wrap;
+    font-size: 1rem;
+  }
+  h1 {
+    margin: 0;
+    padding: 0;
+    font-size: .8rem;
+  }
+  h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.4rem;
+  }
+  .container {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  section {
+    flex: 1;
+  }
+  label {
+    width: 100%;
+  }
+  textarea {
+    padding: 8px;
+    width: 100%;
+    min-height: 160px;
+    border-width: 2px;
+    font-size: 1rem;
+  }
+  button {
+    box-sizing: border-box;
+    margin-top: 16px;
+    padding: 16px;
+    display: inline-block;
+    min-width: 160px;
+    font-weight: bold;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover, button:focus {
+    background-color: #fff;
+    color: #333;
+    border: 2px solid #333;
   }
 </style>
 

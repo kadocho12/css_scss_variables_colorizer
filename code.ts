@@ -11,7 +11,7 @@ function rgbToHex(rgba: VariableValue) :string {
   return `#${r255}${g255}${b255}`;
 }
 
-figma.showUI(__html__);
+figma.showUI(__html__, { width: 800, height: 400 });
 figma.ui.onmessage = async (msg: { type: string, count: number, value: string }) => {
   if (msg.type === 'get-colors') {
     try {
