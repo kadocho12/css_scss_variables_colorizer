@@ -1,14 +1,15 @@
-<h1>CSS/SCSS Variables Colorizer</h1>
 <div class="container">
   <section>
     <h2>Base code</h2>
-    <label for="input-field">Input field</label>
+    <label for="input-field" class="paragraph">Please enter the base code in this input field.</label>
     <textarea value="" type="text" id="variables-template" name="input-field"></textarea>
+    <p class="paragraph">After entering the base code, please press this button.</p>
     <button id="getColorButton">Colorize</button>
   </section>
   <div class="arrow">→</div>
   <section>
     <h2>Colorized code</h2>
+    <p class="paragraph">After the code is generated, please copy it.</p>
     <div class="message-wrapper">
       <pre id="message"></pre>
     </div>
@@ -25,7 +26,7 @@
   }
   .message-wrapper {
     padding: 8px;
-    margin-top: 24px;
+    margin: 0;
     border: 1px solid #eee;
     height: 144px;
     overflow: auto;
@@ -35,16 +36,13 @@
     margin: 0;
     white-space: pre-wrap;
     font-size: 1rem;
-  }
-  h1 {
-    margin: 0;
-    padding: 0;
-    font-size: .8rem;
+    overflow-wrap: anywhere;
   }
   h2 {
     margin: 0;
     padding: 0;
     font-size: 1.4rem;
+    margin-bottom: 8px;
   }
   .container {
     margin-top: 16px;
@@ -65,9 +63,11 @@
     border-width: 2px;
     font-size: 1rem;
   }
+  .paragraph {
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
   button {
-    box-sizing: border-box;
-    margin-top: 16px;
     padding: 16px;
     display: inline-block;
     min-width: 160px;
@@ -77,11 +77,11 @@
     color: #fff;
     border-radius: 8px;
     cursor: pointer;
+    border: 2px solid #333;
   }
   button:hover, button:focus {
     background-color: #fff;
     color: #333;
-    border: 2px solid #333;
   }
 </style>
 
